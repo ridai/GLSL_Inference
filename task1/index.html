@@ -15,6 +15,8 @@
 <script  id="fragment-shader-2d" type="notjs">
   precision mediump float;
 
+  // 課題1. この処理の中で、現在着目しているピクセル位置を検出し、x座標の左から右にかけて好きな色でグラデーションをかけてください。
+  //       canvasサイズは512固定と考えてOKです。
   void main() {
     // 現在注目しているピクセルのx座標を取得し、512(canvasのディスプレイサイズ)で分割
     gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
