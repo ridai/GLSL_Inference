@@ -5,7 +5,6 @@
   // vec4の初期値は、(0,0,0,1)である
   attribute vec4 a_position;
 
-  // 課題1. この処理の中で、a_positionを回転させて菱形にしてください。（回転角度は任意）
   void main() {
     // 現状、入力ベクトルをそのまま返しているだけ
     gl_Position = a_position;
@@ -20,12 +19,13 @@
     // フラグメント座標の正規化
     vec2 p = (gl_FragCoord.xy * 2.0 - r) / min(r.x, r.y);
 
-    // 課題3. この処理の中で、マンデルブロ集合を描画してください。
+    // ****課題3****
+    // この処理の中で、マンデルブロ集合を描画してください。
     // 参考(https://en.wikipedia.org/wiki/Mandelbrot_set)
 
     // 最終的な色の出力
     gl_FragColor = vec4(vec3(0.0, 0.8, 0.8), 1.0);
-
+    // ★★★★★★★★★★★★
   }
 </script>
 <!--

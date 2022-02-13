@@ -33,6 +33,15 @@ function createProgram(gl, vertexShader, fragmentShader) {
   console.log(gl.getProgramInfoLog(program));
   gl.deleteProgram(program);
 }
+// キャンバス描画の初期化
+function initCanvas(gl){
+  webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+  // WebGL上で、クリップ空間(-1~1で表現される座標)をキャンバス座標に変換するために必要な情報を渡す
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  // キャンバスの色を無色に初期化する
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+}
 
 function main() {
   // ===== 初期化処理 =====
@@ -43,59 +52,46 @@ function main() {
     return;
   }
 
+  // ----- シェーダの定義 ----
   // 頂点シェーダの定義を文字列として取得
   var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
   // フラグメントシェーダの定義を文字列として取得
   var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
-
   // createShaderメソッドをcallしてコンパイルまで行う
   var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
   var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-
   // シェーダをプログラムにまとめ、WebGLにリンクさせる
   var program = createProgram(gl, vertexShader, fragmentShader);
 
+  // ----- シェーダに渡す引数の定義 ----
   // 頂点シェーダに与える引数(a_position)を特定し、WebGLに認識させる
   var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-
-  // a_positionはattibution属性(=buffer)であるため、buffer領域を定義する
-  var positionBuffer = gl.createBuffer();
-
-  // buffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
   // 実際に、a_positionに与えるデータを定義する
-  // 課題2. 星形を表現するために必要な座標を定義して与えてください。
+  // ★★★★課題2★★★★
+  // 星形を表現するために必要な座標を定義して与えてください。
   var positions = [
     0, 0,
     0, 0.5,
     0.7, 0.5,
     0.7, 0,
   ];
-  // bufferDataにて、上記positionsを、ARRAY_BUFFERに与える
-  // 第一引数: ARRAY_BUFFERの指定
-  // 第二引数: 与えるデータを指定。この時、厳密な型が必要なため、キャストを行なっている
-  // 第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+  // ★★★★★★★★★★★★
 
-  // ===== レンダリング処理 =====
-  webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-
-  // WebGL上で、クリップ空間(-1~1で表現される座標)をキャンバス座標に変換するために必要な情報を渡す
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-  // キャンバスの色を無色に初期化する
-  gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-
-  // 使うプログラムを指定
-  gl.useProgram(program);
-
+  // buffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
   // attribute属性の引数(=a_position)の入力を有効化する
   gl.enableVertexAttribArray(positionAttributeLocation);
 
-  // buffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  // ===== レンダリング処理 =====
+  // ---- キャンバスの設定 ----
+  initCanvas(gl);
+  // 使うプログラムを指定
+  gl.useProgram(program);
+  // 「ARRAY_BUFFER」が指す領域に、頂点情報を格納する
+  //   第一引数: ARRAY_BUFFERの指定
+  //   第二引数: 与えるデータを指定。この時、厳密な型が必要なため、キャストを行なっている
+  //   第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
   // positionsデータをどのようにARRAY_BUFFERに搭載するかを定義する。
   // 頂点シェーダでは、vec4(4次元のベクトル)を入力とするので、想定するデータフォーマットになるように整形する

@@ -4,27 +4,44 @@
   // 入力ベクトルとして、4次元(x,y,z,w)ベクトルを受け取る
   // vec4の初期値は、(0,0,0,1)である
   attribute vec4 a_position;
+  // テクスチャ座標を受け取る
+  attribute vec2 a_texcoord;
+  // 頂点シェーダーからフラグメントシェーダに渡すデータ
+  // ここでは、テクスチャ座標の変換後の座標を代入することになる
+  varying vec2 v_texcoord;
 
   // 課題1. この処理の中で、a_positionを回転させて菱形にしてください。（回転角度は任意）
   void main() {
     // 現状、入力ベクトルをそのまま返しているだけ
     gl_Position = a_position;
+    // テクスチャ座標をフラグメントシェーダーへ渡す。
+    v_texcoord = a_texcoord;
   }
 
 </script>
 <script  id="fragment-shader-2d" type="notjs">
   precision mediump float;
   uniform vec2  r;
+  // 頂点シェーダーから渡されたテクスチャ座標
+  varying vec2 v_texcoord;
+  // テクスチャ
+  uniform sampler2D u_texture;
 
   void main(void){
     // フラグメント座標の正規化
     vec2 p = (gl_FragCoord.xy * 2.0 - r) / min(r.x, r.y);
 
-    // 課題3. この処理の中で、マンデルブロ集合を描画してください。
-    // 参考(https://en.wikipedia.org/wiki/Mandelbrot_set)
+    vec3 cPos = vec3(0.0,  0.0,  3.0); // カメラの位置
+    vec3 cDir = vec3(0.0,  0.0, -1.0); // カメラの向き(視線)
+    vec3 cUp  = vec3(0.0,  1.0,  0.0); // カメラの上方向
+    vec3 cSide = cross(cDir, cUp);     // 外積を使って横方向を算出
+    float targetDepth = 0.1;           // フォーカスする深度
+
+    // ray
+    vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
 
     // 最終的な色の出力
-    gl_FragColor = vec4(vec3(0.0, 0.8, 0.8), 1.0);
+    gl_FragColor = vec4(ray.xy, -ray.z, 1.0);
 
   }
 </script>
