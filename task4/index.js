@@ -2,6 +2,8 @@
 "use strict";
 
 var RESOLUTION = 512;
+const TEXTURE_WIDTH = 100;
+const TEXTURE_HEIGHT = 100;
 
 // シェーダをGPUにUploadしてコンパイルまで行う
 function createShader(gl, type, source) {
@@ -61,12 +63,32 @@ function setVertex(gl){
   //   第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 }
-// ****課題4****
-// ポリゴンに対応するテクスチャマップの座標情報を定義してください
+// ポリゴンに対応するテクスチャマップの座標情報を定義
 function setTexcoords(gl) {
+  var texcoords = [
+    0.0, 0.0,
+    0.0, 1.0,
+    1.0, 1.0,
+    0.0, 0.0,
+    1.0, 1.0,
+    1.0, 0.0,
+  ];
+  // 「ARRAY_BUFFER」が指す領域に、頂点情報を格納する
+  //   第一引数: ARRAY_BUFFERの指定
+  //   第二引数: 与えるデータを指定。この時、厳密な型が必要なため、キャストを行なっている
+  //   第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texcoords), gl.STATIC_DRAW);
 }
-// ************
+function computeKernelWeight(kernel) {
+  var weight = kernel.reduce(function(prev, curr) {
+      return prev + curr;
+  });
+  return weight <= 0 ? 1 : weight;
+}
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
 function main() {
   function drawScene(){
     // ===== レンダリング処理 =====
@@ -104,7 +126,9 @@ function main() {
 
     // uniformを与える
     gl.uniform2fv(resolutionUniformLocation, [RESOLUTION, RESOLUTION]);
-    gl.uniform1i(textureUniformLocation, 0);
+    // ****課題5****
+    // 任意の畳み込み行列を宣言して、フラグメントシェーダに引数として渡そう
+    // *************
 
     // draw
     var primitiveType = gl.TRIANGLES; // 頂点6つを使って、三角形を2つ描画する
@@ -136,9 +160,12 @@ function main() {
   // 頂点シェーダに与える引数(a_position/a_texcoords)を特定し、WebGLに認識させる
   var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
   var texcoordAttributeLocation = gl.getAttribLocation(program, "a_texcoords");
-  // フラグメントシェーダに与える引数(r=解像度/texture情報)を特定し、WebGLに認識させる
+  // フラグメントシェーダに与える引数(r=解像度/texture情報/畳み込み行列/畳み込み重み)を特定し、WebGLに認識させる
   var resolutionUniformLocation = gl.getUniformLocation(program, 'r');
   var textureUniformLocation = gl.getUniformLocation(program, "u_texture");
+  var kernelUniformLocation = gl.getUniformLocation(program, "u_kernel[0]");
+  var kernelWeightUniformLocation = gl.getUniformLocation(program, "u_kernelWeight");
+  var textureSizeUniformLocation = gl.getUniformLocation(program, "u_textureSize");
 
   // ---- positions設定 ----
   // position用のbuffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
@@ -158,11 +185,15 @@ function main() {
   // texture情報そのものを格納する領域をWebGL固有の「TEXTURE_2D」フィールドに紐づける
   var texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
-
   // ****課題5****
-  // WebGLにbindした、TEXTURE_2Dを使って、実際に画像を読み込ませる処理を実装してください。
-  // textureの初期値として、1x1の青色のピクセルを塗る
-  // ***********
+  // テクスチャを利用して、100x100行列データを適当に作ってフラグメントシェーダに渡す
+
+  // もしtextureのサイズが4の倍数でない値にしたい場合は、以下設定を使うこと
+  // const alignment = 1;
+  // gl.pixelStorei(gl.UNPACK_ALIGNMENT, alignment);
+  // *************
+
+
   drawScene();
 }
 

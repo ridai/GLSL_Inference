@@ -1,15 +1,18 @@
-## タスクその3
+## タスクその4
 ### 目的
 GLSLのサンプルを動かしてみて、頂点シェーダとフラグメントシェーダを試してみる
 
 ### やること
 
-- 課題4: index.jsを改造して以下機能を実装してください。
-  - テクスチャの座標系(texcoords)を指定する必要があるので、setTexcoords()関数を完成させてください。
-  -
+- 課題5: index.jsを改造して以下機能を実装してください。
+  - 画像ではなく、適当な100x100行列を作成して、フラグメントシェーダに渡すようにする
+  - 同じく、畳み込み行列として、10x10行列を作成して、フラグメントシェーダに渡すようにする
+
+- 課題6: index.htmlを改造して以下機能を実装してください。
+  - 課題5で与えた行列を使って畳み込み処理を行う
 
 出来上がりのイメージ
-<img width="511" alt="スクリーンショット 2022-02-13 17 43 09" src="https://user-images.githubusercontent.com/2268153/153745831-053167ae-1e2e-4815-ab7e-393626fd2e20.png">
+<img width="511" alt="スクリーンショット 2022-02-14 3 12 05" src="https://user-images.githubusercontent.com/2268153/153768636-6b16ed2a-7e1c-4731-8805-5663b86f57c0.png">
 
 
 * 実装にあたっては、実装内容・補足説明・参考資料を読んで取り組んでください。
@@ -17,12 +20,8 @@ GLSLのサンプルを動かしてみて、頂点シェーダとフラグメン�
 ---
 
 ## 補足説明
-- 画像の読み込み時に、CORS errorが発生する
-  - ローカルファイルの読み込みを行おうとすることで、セキュリティエラーが発生する可能性がある（特にchrome
-  - chromeを使う場合は、一回chromeを落としてから、ターミナルから以下コマンドで起動するとCORS errorを回避できる
-  ```open /Applications/Google\ Chrome.app/ --args --allow-file-access-from-files --user-data-dir```
 
 ---
 
 ## 参考資料
-https://webglfundamentals.org/webgl/lessons/ja/webgl-fundamentals.html
+https://jp.mathworks.com/discovery/convolutional-neural-network-matlab.html
