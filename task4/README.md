@@ -6,10 +6,10 @@ GLSLのサンプルを動かしてみて、頂点シェーダとフラグメン�
 
 - 課題4: index.jsを改造して以下機能を実装してください。
   - テクスチャの座標系(texcoords)を指定する必要があるので、setTexcoords()関数を完成させてください。
-  - 実際のテクスチャ画像(texture.jpg)を読み込ませて、画面上に表示させるロジックを完成させてください。
+  -
 
 出来上がりのイメージ
-<img width="508" alt="スクリーンショット 2022-02-14 1 47 51" src="https://user-images.githubusercontent.com/2268153/153765477-fd804b4f-367d-4278-9226-b49e12e9c110.png">
+<img width="511" alt="スクリーンショット 2022-02-13 17 43 09" src="https://user-images.githubusercontent.com/2268153/153745831-053167ae-1e2e-4815-ab7e-393626fd2e20.png">
 
 
 * 実装にあたっては、実装内容・補足説明・参考資料を読んで取り組んでください。
@@ -25,4 +25,4 @@ GLSLのサンプルを動かしてみて、頂点シェーダとフラグメン�
 ---
 
 ## 参考資料
-https://webglfundamentals.org/webgl/lessons/ja/webgl-3d-textures.html
+https://webglfundamentals.org/webgl/lessons/ja/webgl-fundamentals.html
