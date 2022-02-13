@@ -1,6 +1,8 @@
 /* eslint no-console:0 consistent-return:0 */
 "use strict";
 
+var RESOLUTION = 512;
+
 // シェーダをGPUにUploadしてコンパイルまで行う
 function createShader(gl, type, source) {
   var shader = gl.createShader(type);
@@ -77,6 +79,9 @@ function main() {
   // 第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
+  // フラグメントシェーダに与える引数(r)=解像度を特定し、WebGLに認識させる
+  var resolutionUniformLocation = gl.getUniformLocation(program, 'r');
+
   // ===== レンダリング処理 =====
   webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
@@ -89,6 +94,9 @@ function main() {
 
   // 使うプログラムを指定
   gl.useProgram(program);
+
+  // uniformを与える
+  gl.uniform2fv(resolutionUniformLocation, [RESOLUTION, RESOLUTION]);
 
   // attribute属性の引数(=a_position)の入力を有効化する
   gl.enableVertexAttribArray(positionAttributeLocation);

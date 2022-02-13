@@ -14,14 +14,19 @@
 </script>
 <script  id="fragment-shader-2d" type="notjs">
   precision mediump float;
+  uniform vec2  r;
 
-  // 課題1. この処理の中で、現在着目しているピクセル位置を検出し、x座標の左から右にかけて好きな色でグラデーションをかけてください。
-  //       canvasサイズは512固定と考えてOKです。
-  void main() {
-    // 現在注目しているピクセルのx座標を取得し、512(canvasのディスプレイサイズ)で分割
-    gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+  void main(void){
+    // フラグメント座標の正規化
+    vec2 p = (gl_FragCoord.xy * 2.0 - r) / min(r.x, r.y);
+
+    // 課題3. この処理の中で、マンデルブロ集合を描画してください。
+    // 参考(https://en.wikipedia.org/wiki/Mandelbrot_set)
+
+    // 最終的な色の出力
+    gl_FragColor = vec4(vec3(0.0, 0.8, 0.8), 1.0);
+
   }
-
 </script>
 <!--
 for most samples webgl-utils only provides shader compiling/linking and
