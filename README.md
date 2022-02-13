@@ -102,8 +102,10 @@ void main(void){
 当然、GPUによる並列・高速化の恩恵が得られるため、普通にJavaScriptで計算を実装するよりも高速になることが期待できる、という算段である。
 
 ### 参考
+
 Tensorflow.jsではどうやってWebGLを利用しているのか？
 → https://tfujiwar.hatenablog.com/entry/2018/05/21/120815
+
 WebGLの基本
 → https://webglfundamentals.org/webgl/lessons/ja/webgl-fundamentals.html
 
