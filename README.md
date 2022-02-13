@@ -1,5 +1,5 @@
 # GLSL_Inference
-GLSLを使って、オレオレTensorflow.jsを作って、推論処理を実装してみる
+GLSLを使って、オレオレ畳み込み機能を作ってみよう
 
 ## 目的
 - フラグメントシェーダーの記述言語として、GLSLを学んでみる
@@ -60,10 +60,10 @@ GLSLでは、上記2つのシェーダを合わせて「プログラム」とよ
 ```c
 // 入力として、4次元(x,y,z,w)の頂点情報を受け取る
 attribute vec4 a_position;
- 
+
 // 全てのシェーダーは「main」の関数が必要
 void main() {
- 
+
   // gl_Positionを得ることが頂点シェーダの目的
   // ここでは、入力のベクトルをそのまま返しているだけ。
   gl_Position = a_position;
