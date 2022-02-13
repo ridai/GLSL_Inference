@@ -65,6 +65,7 @@ function main() {
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
   // 実際に、a_positionに与えるデータを定義する
+  // 課題2. 星形を表現するために必要な座標を定義して与えてください。
   var positions = [
     0, 0,
     0, 0.5,
