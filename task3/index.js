@@ -42,10 +42,77 @@ function initCanvas(gl){
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   // キャンバスの色を無色に初期化する
   gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
+// ポリゴンの頂点情報を格納する
+function setVertex(gl){
+  // 実際に、a_positionに与えるデータを定義する
+  var positions = [
+    -1.0, -1.0,
+    -1.0, 1.0,
+    1.0, 1.0,
+    -1.0, -1.0,
+    1.0, 1.0,
+    1.0, -1.0,
+  ];
+  // 「ARRAY_BUFFER」が指す領域に、頂点情報を格納する
+  //   第一引数: ARRAY_BUFFERの指定
+  //   第二引数: 与えるデータを指定。この時、厳密な型が必要なため、キャストを行なっている
+  //   第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+}
+// ****課題4****
+// ポリゴンに対応するテクスチャマップの座標情報を定義してください
+function setTexcoords(gl) {
+}
+// ************
 
 function main() {
+  function drawScene(){
+    // ===== レンダリング処理 =====
+    // ---- キャンバスの設定 ----
+    initCanvas(gl);
+
+    // 使うプログラムを指定
+    gl.useProgram(program);
+
+    // attribute属性の引数(=a_position)の入力を有効化する
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    // a_positionにが指すデータをどのように入力値として解釈するか(=vec4のデータと見るか)定義を行う。
+    // 頂点シェーダでは、vec4(4次元のベクトル)を入力とするので、想定するデータフォーマットになるように整形する
+    var size = 2;          // positionsから2要素ずつ切り取る
+    var type = gl.FLOAT;   // 32bit float型
+    var normalize = false; // 正規化行わない
+    var stride = 0;        // 次のデータの切り出しを行う際の移動幅
+    var offset = 0;        // 最初の切り出しを行う際に読み飛ばす幅
+    gl.vertexAttribPointer(
+        positionAttributeLocation, size, type, normalize, stride, offset);
+
+    // attribute属性の引数(=a_textcoords)の入力を有効化する
+    gl.enableVertexAttribArray(texcoordAttributeLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+    // a_texcoordsにが指すデータをどのように入力値として解釈するか(=vec4のデータと見るか)定義を行う。
+    // 頂点シェーダでは、vec4(4次元のベクトル)を入力とするので、想定するデータフォーマットになるように整形する
+    var size = 2;          // texcoordsから2要素ずつ切り取る
+    var type = gl.FLOAT;   // 32bit float型
+    var normalize = false; // 正規化行わない
+    var stride = 0;        // 次のデータの切り出しを行う際の移動幅
+    var offset = 0;        // 最初の切り出しを行う際に読み飛ばす幅
+    gl.vertexAttribPointer(
+        texcoordAttributeLocation, size, type, normalize, stride, offset);
+
+    // uniformを与える
+    gl.uniform2fv(resolutionUniformLocation, [RESOLUTION, RESOLUTION]);
+    gl.uniform1i(textureUniformLocation, 0);
+
+    // draw
+    var primitiveType = gl.TRIANGLES; // 頂点6つを使って、三角形を2つ描画する
+    var offset = 0;
+    var count = 6; // 頂点6つ使って描画することを表す
+    gl.drawArrays(primitiveType, offset, count);
+  }
+
   // ===== 初期化処理 =====
   // canvasタグを指定して取得
   var canvas = document.querySelector("#c");
@@ -72,55 +139,32 @@ function main() {
   // フラグメントシェーダに与える引数(r=解像度/texture情報)を特定し、WebGLに認識させる
   var resolutionUniformLocation = gl.getUniformLocation(program, 'r');
   var textureUniformLocation = gl.getUniformLocation(program, "u_texture");
-  // 実際に、a_positionに与えるデータを定義する
-  var positions = [
-    -1.0, -1.0,
-    -1.0, 1.0,
-    1.0, 1.0,
-    1.0, -1.0,
-  ];
-  // テクスチャデータを定義する
 
-  // buffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-  // attribute属性の引数(=a_position/a_texcoord)の入力を有効化する
-  gl.enableVertexAttribArray(positionAttributeLocation);
-  gl.enableVertexAttribArray(texcoordAttributeLocation);
+  // ---- positions設定 ----
+  // position用のbuffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  // positionの定義とバッファへの格納を行う
+  setVertex(gl)
 
-  // ===== レンダリング処理 =====
-  // ---- キャンバスの設定 ----
-  initCanvas(gl);
+  // ---- texturecoords設定 ----
+  // texture座標用のbuffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
+  var texcoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+  // テクスチャ座標情報の定義とバッファへの格納を行う
+  setTexcoords(gl)
 
-  // 使うプログラムを指定
-  gl.useProgram(program);
-  // uniformを与える
-  gl.uniform2fv(resolutionUniformLocation, [RESOLUTION, RESOLUTION]);
+  // ---- texture設定 ----
+  // texture情報そのものを格納する領域をWebGL固有の「TEXTURE_2D」フィールドに紐づける
+  var texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
 
-  // 「ARRAY_BUFFER」が指す領域に、頂点情報を格納する
-  //   第一引数: ARRAY_BUFFERの指定
-  //   第二引数: 与えるデータを指定。この時、厳密な型が必要なため、キャストを行なっている
-  //   第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-  // a_positionにが指すデータをどのように入力値として解釈するか(=vec4のデータと見るか)定義を行う。
-  // 頂点シェーダでは、vec4(4次元のベクトル)を入力とするので、想定するデータフォーマットになるように整形する
-  var size = 2;          // positionsから2要素ずつ切り取る
-  var type = gl.FLOAT;   // 32bit float型
-  var normalize = false; // 正規化行わない
-  var stride = 0;        // 次のデータの切り出しを行う際の移動幅
-  var offset = 0;        // 最初の切り出しを行う際に読み飛ばす幅
-  gl.vertexAttribPointer(
-      positionAttributeLocation, size, type, normalize, stride, offset);
-  // draw
-  var primitiveType = gl.TRIANGLE_FAN; // 頂点4つを使って、三角形を2つ描画する
-  var offset = 0;
-  var count = 4; // 頂点4つ使って描画することを表す
-  gl.drawArrays(primitiveType, offset, count);
-
-  // 32bit浮動小数点数(float)でtextureをシェーダーへ渡す。
-  gl.vertexAttribPointer(
-    texcoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-
+  // ****課題5****
+  // WebGLにbindした、TEXTURE_2Dを使って、実際に画像を読み込ませる処理を実装してください。
+  // textureの初期値として、1x1の青色のピクセルを塗る
+  // ***********
+  drawScene();
 }
+
 
 main();

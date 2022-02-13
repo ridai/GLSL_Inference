@@ -44,7 +44,21 @@ function initCanvas(gl){
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT);
 }
-
+// ポリゴンの頂点情報を格納する
+function setVertex(gl){
+  // 実際に、a_positionに与えるデータを定義する
+  var positions = [
+    0, 0,
+    0, 0.5,
+    0.7, 0.5,
+    0.7, 0,
+  ];
+  // 「ARRAY_BUFFER」が指す領域に、頂点情報を格納する
+  //   第一引数: ARRAY_BUFFERの指定
+  //   第二引数: 与えるデータを指定。この時、厳密な型が必要なため、キャストを行なっている
+  //   第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+}
 function main() {
   // ===== 初期化処理 =====
   // canvasタグを指定して取得
@@ -70,31 +84,24 @@ function main() {
   var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
   // フラグメントシェーダに与える引数(r)=解像度を特定し、WebGLに認識させる
   var resolutionUniformLocation = gl.getUniformLocation(program, 'r');
-  // 実際に、a_positionに与えるデータを定義する
-  var positions = [
-    0, 0,
-    0, 0.5,
-    0.7, 0.5,
-    0.7, 0,
-  ];
 
-  // buffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-  // attribute属性の引数(=a_position)の入力を有効化する
-  gl.enableVertexAttribArray(positionAttributeLocation);
+  // position用のbuffer領域をWebGL固有の「ARRAY_BUFFER」フィールドに紐づける
+  var positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  // positionの定義とバッファへの格納を行う
+  setVertex(gl)
 
   // ===== レンダリング処理 =====
   initCanvas(gl);
   // 使うプログラムを指定
   gl.useProgram(program);
-  // 「ARRAY_BUFFER」が指す領域に、頂点情報を格納する
-  //   第一引数: ARRAY_BUFFERの指定
-  //   第二引数: 与えるデータを指定。この時、厳密な型が必要なため、キャストを行なっている
-  //   第三引数: データの更新頻度を指定している。STATIC_DRAWは更新頻度低
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
   // uniformを与える
   gl.uniform2fv(resolutionUniformLocation, [RESOLUTION, RESOLUTION]);
 
+  // attribute属性の引数(=a_position)の入力を有効化する
+  gl.enableVertexAttribArray(positionAttributeLocation);
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   // positionsデータをどのようにARRAY_BUFFERに搭載するかを定義する。
   // 頂点シェーダでは、vec4(4次元のベクトル)を入力とするので、想定するデータフォーマットになるように整形する
   var size = 2;          // positionsから2要素ずつ切り取る
