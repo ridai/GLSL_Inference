@@ -23,22 +23,10 @@ GLSLのサンプルを動かしてみて、頂点シェーダとフラグメン�
   - 頂点シェーダ/フラグメントシェーダの定義が書かれている。実際に利用されるのはJS内のWebGL API呼び出し内。
   - 特段大規模な開発は想定していないので、scriptタグ内で定義している。
 
-### index.js
-- シェーダの読み込み
-  - index.htmlで定義した頂点シェーダとフラグメントシェーダを、実際にGPUにUpload&Compileする
-- キャンバスサイズ
-
 ### index.css
 - canvas
   - 柔軟性を持たせるため、キャンバスサイズの定義はここで行なっている
 
-
-```JS
-// シェーダーを作成
-var shader = gl.createShader(gl.VERTEX_SHADER); // 頂点シェーダ作成
-gl.shaderSource(shader, source); // scriptタグで定義したシェーダ文字列(=source)をGPUにUpload。
-gl.compileShader(shader); // Compile
-```
 
 ---
 
